@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import './ProductList.css'
 import CartItem from './CartItem';
+import addItem from CartSlice.jsx;
 function ProductList({ onHomeClick }) {
     const [showCart, setShowCart] = useState(false);
-    const [showPlants, setShowPlants] = useState(false); // State to control the visibility of the About Us page
+    const [showPlants, setShowPlants] = useState(false); 
+    const [addedToCart, setAddedToCart] = useState({});
 
     const plantsArray = [
         {
@@ -252,6 +254,13 @@ function ProductList({ onHomeClick }) {
         e.preventDefault();
         setShowCart(false);
     };
+    const handleAddToCart = (product) => {
+        dispatch(addItem(product));
+        setAddedToCart((prevState) => ({ 
+        ...prevState,
+        [product.name]: true, 
+  }));
+};
     return (
         <div>
             <div className="navbar" style={styleObj}>
@@ -274,20 +283,26 @@ function ProductList({ onHomeClick }) {
             </div>
             {!showCart ? (
                 <div className="product-grid">
-                    {plantsArray.map((category, categoryIndex) => (
-                        <div key={categoryIndex} className="mb-6">
-                            <h2 className="text-xl font-semibold mb-3">{category.category}</h2>
-
-                            {category.plants.map((plant, plantIndex) => (
-                                <div key={plantIndex} className="border p-4 mb-4 rounded">
-                                    <img src={plant.image} alt={plant.name} className="w-32 h-32 object-cover mb-2" />
-                                    <h3 className="font-bold">{plant.name}</h3>
-                                    <p className="text-gray-600">{plant.description}</p>
-                                    <p className="font-semibold text-green-600">{plant.cost}</p>
-                                </div>
-                            ))}
+                    {plantsArray.map((category, index) => ( // Loop through each category in plantsArray
+                      <div key={index}> {/* Unique key for each category div */}
+                        <h1>
+                          <div>{category.category}</div> {/* Display the category name */}
+                        </h1>
+                        <div className="product-list"> {/* Container for the list of plant cards */}
+                          {category.plants.map((plant, plantIndex) => ( 
+                        <div className="product-card" key={plantIndex}> {/* Unique key for each plant card */}
+                          <img className="product-image" src={plant.image} alt={plant.name} />
+                  <div className="product-title">{plant.name}</div> {/* Display plant name */}
+                  <div className="product-description">{plant.description}</div> {/* Display plant description */}
+                  <div className="product-cost">${plant.cost}</div> {/* Display plant cost */}
+                  <button className="product-button" onClick={() => handleAddToCart(plant)}> Add to Cart </button>
+                            </div>
+                          ))}
                         </div>
+                      </div>
                     ))}
+                    </div>
+                ))}
                 </div>
                 ) : (
                 <CartItem onContinueShopping={handleContinueShopping} />
